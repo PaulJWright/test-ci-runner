@@ -1,0 +1,25 @@
+name: lint
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check out test-ci, for the contract check
+        uses: actions/checkout@v5
+        with:
+          repository: PaulJWright/test-ci
+          path: test-ci
+      - name: Install actionlint
+        run: |
+          bash <(curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+          echo "$PWD" >> "$GITHUB_PATH"
+      - run: tests/lint.sh
+        env:
+          TEST_CI_DIR: test-ci
+          CHECK_CONTRACT: "1"
+      - run: tests/simulate.sh

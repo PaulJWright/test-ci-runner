@@ -1,0 +1,21 @@
+#!/bin/bash
+# test-ci-apptainer: a custom shell for workflow steps. Runs the step's script inside
+# the image in TEST_CI_IMAGE with Apptainer, with the GPU (--nv), the workspace and
+# the runner's temp folder (which holds $GITHUB_OUTPUT, $GITHUB_ENV and the script).
+#
+# In a workflow step (the launcher puts this folder on PATH):
+#   shell: test-ci-apptainer {0}
+#   env:
+#     TEST_CI_IMAGE: ubuntu:24.04          # or docker://…, oras://…, /path/to/image.sif
+#
+# Each step gets a fresh container: only the workspace, RUNNER_TEMP and $HOME carry over.
+set -euo pipefail
+script=${1:?usage: test-ci-apptainer <script>}
+image=${TEST_CI_IMAGE:?test-ci-apptainer: set TEST_CI_IMAGE to the image to run in}
+case $image in
+  *://*|/*|*.sif) ;;
+  *) image="docker://$image" ;;
+esac
+export APPTAINER_CACHEDIR="${APPTAINER_CACHEDIR:-${TMPDIR:-/tmp}/apptainer-cache}"
+exec apptainer exec --nv --bind "$RUNNER_TEMP" --bind "$GITHUB_WORKSPACE" \
+  "$image" bash --noprofile --norc -eo pipefail "$script"
