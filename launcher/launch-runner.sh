@@ -2,11 +2,13 @@
 # launch-runner.sh: runs inside every test-ci Slurm job. Starts GitHub's own
 # runner for exactly one job, in a private copy, and cleans up after it.
 #
-#   launch-runner.sh --profile P --config-file F [--expect-repo OWNER/REPO] [--expect-run ID]
-#   launch-runner.sh --profile P --config-env    [--expect-repo OWNER/REPO] [--expect-run ID]
+#   launch-runner.sh --profile P --runner-minutes N --config-file F [--expect-repo OWNER/REPO] [--expect-run ID]
+#   launch-runner.sh --profile P --runner-minutes N --config-env    [--expect-repo OWNER/REPO] [--expect-run ID]
 #
-# --config-file: a 0600 file holding the runner config; read, then deleted (submit.sh)
-# --config-env:  the config is already in ACTIONS_RUNNER_INPUT_JITCONFIG (MVP job script)
+# --profile:        the profile's name, for the log
+# --runner-minutes: how long the runner may live, from test-ci's profiles.json
+# --config-file:    a 0600 file holding the runner config; read, then deleted (submit.sh)
+# --config-env:     the config is already in ACTIONS_RUNNER_INPUT_JITCONFIG (MVP job script)
 #
 # From Phase 0 (see the plan's "Phase 0 results"):
 # - Slurm sends SIGTERM to this script only, and SIGKILL to everything 30 s later.
@@ -17,6 +19,7 @@
 # From Phase 1:
 # - A runner whose job has gone before Slurm starts it sits idle. Stop it after
 #   IDLE_MINUTES without a job (the hook marks a job's start).
+IDLE_MINUTES=10
 set -euo pipefail
 umask 077
 
@@ -26,15 +29,14 @@ TEST_CI_RUNNER_HOME=$(cd "$here/.." && pwd)
 # ~/test-ci-runner, /opt/actions-runner/current for /opt/test-ci-runner (the dev stack, and later a shared
 # install). <it>.tar beside it, if present, is copied instead (much faster).
 RUNNER_HOME=${RUNNER_HOME:-$(dirname "$TEST_CI_RUNNER_HOME")/actions-runner/current}
-# shellcheck source=profiles.sh
-. "$here/profiles.sh"
 
 log() { echo "test-ci: $* ($(date -Is))"; }
 
-profile="" config_file="" config_env=0 expect_repo="" expect_run=""
+profile="" RUNNER_MINUTES="" config_file="" config_env=0 expect_repo="" expect_run=""
 while [ $# -gt 0 ]; do
   case $1 in
     --profile) profile=$2; shift 2 ;;
+    --runner-minutes) RUNNER_MINUTES=$2; shift 2 ;;
     --config-file) config_file=$2; shift 2 ;;
     --config-env) config_env=1; shift ;;
     --expect-repo) expect_repo=$2; shift 2 ;;
@@ -42,7 +44,9 @@ while [ $# -gt 0 ]; do
     *) echo "test-ci: unknown argument: $1" >&2; exit 2 ;;
   esac
 done
-profile_settings "$profile" || { echo "test-ci: unknown profile '$profile'" >&2; exit 2; }
+[[ $profile =~ ^[a-z0-9-]+$ ]] || { echo "test-ci: bad or missing --profile '$profile'" >&2; exit 2; }
+[[ $RUNNER_MINUTES =~ ^[0-9]+$ ]] && [ "$RUNNER_MINUTES" -ge 1 ] && [ "$RUNNER_MINUTES" -le 1440 ] \
+  || { echo "test-ci: --runner-minutes must be 1 to 1440, not '$RUNNER_MINUTES'" >&2; exit 2; }
 
 # 1. The runner config
 if [ -n "$config_file" ]; then

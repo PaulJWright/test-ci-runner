@@ -1,6 +1,6 @@
 #!/bin/bash
-# Runs shellcheck on every script, actionlint on the workflows, and the profile and
-# contract checks (set TEST_CI_DIR to a test-ci checkout for the contract).
+# Runs shellcheck on every script, actionlint on the workflows, and the contract
+# check with test-ci (set TEST_CI_DIR to a test-ci checkout).
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
 cd "$root"
@@ -10,4 +10,4 @@ if command -v actionlint >/dev/null; then
 else
   echo "actionlint not installed: skipped"
 fi
-tests/check-profiles.sh
+tests/check-contract.sh
