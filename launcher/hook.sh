@@ -1,7 +1,7 @@
 #!/bin/bash
-# hook.sh: the runner's pre-job hook (ACTIONS_RUNNER_HOOK_JOB_STARTED). It runs
-# before the job's first step; a non-zero exit fails the job before any of the
-# job's own code runs.
+# hook.sh: the runner's pre-job hook (ACTIONS_RUNNER_HOOK_JOB_STARTED). 
+# - It runs before the job's first step. 
+# - A non-zero exit fails the job before any of the job's own code runs.
 #
 # Phase 1: log what the job is, and refuse a job from a repo or run other than
 # the one this runner was started for. Phase B: ask Service 1 instead.
