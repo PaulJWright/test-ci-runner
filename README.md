@@ -139,12 +139,17 @@ On Isambard-AI, 13 Nov 2026, with `dispatch: manual`:
 - a matrix gives one queued job per profile; `gh200-1gpu` gets one GPU and `gh200-4gpu` a whole node with four (after 40 min in the Slurm queue);
 - runner configs left unused for 41 min and for 2 h 34 min still work.
 
-Not yet tested on the cluster: the idle stop, and `dispatch: mvp` through
-`isambard-sc/ci-service` (Phase A).
+Later on Isambard-AI:
+
+- after the profiles moved to test-ci's `profiles.json` (15 Nov), a manual run passed with the profile's limits, and `scancel` on a waiting runner stopped it and cleaned up within a second;
+- the idle stop (17 Nov): a runner given no job stopped itself 600 s after starting and cleaned up, and Slurm recorded COMPLETED after 10 min instead of holding the GPU for the job's hour.
+
+On ci-service's dev stack, 15 Nov, with `dispatch: mvp` (Phase A): a pushed job, released as `testuser.project1`, ran through the ssh → sudo chain and passed. Unlike Isambard-AI, the dev Slurm signals every process on `scancel`, so a cancelled job shows as failed there.
 
 ## Known gaps
 
 - A Slurm job cancelled before it starts leaves its config file in `~/.test-ci` and its runner registration in GitHub.
+- A runner that never takes a job (cancelled, or stopped by the idle stop) leaves its registration in GitHub, offline. GitHub removes it after a day.
 - When a GitHub job is cancelled or fails before its runner starts, the dispatcher doesn't cancel the Slurm job. The runner stops itself after 10 minutes without a job.
 
 ## Checks
