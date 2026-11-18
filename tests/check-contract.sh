@@ -35,8 +35,18 @@ mkdir -p "$t/stub" "$t/runner" "$t/home" "$t/tmp"
 printf '#!/bin/bash\necho QUJD\n' > "$t/stub/gh"
 cat > "$t/stub/curl" <<'STUB'
 #!/bin/bash
-for a in "$@"; do case $a in @*) cp "${a#@}" "$T/job.sh" ;; esac; done
-echo '{"job_id": 1, "task_token": "tt", "release_url": null}'
+# The job API's reply, as ci-service gives it: to the file after -o, with the HTTP
+# code for -w, or on stdout if request.sh doesn't ask for those
+reply='{"id": "dQw4w9WgXcQ", "release_url": "https://ci.example/ci/job?id=dQw4w9WgXcQ"}'
+out=""
+while [ $# -gt 0 ]; do
+  case $1 in
+    -o) out=$2; shift 2 ;;
+    @*) cp "${1#@}" "$T/job.sh"; shift ;;
+    *) shift ;;
+  esac
+done
+if [ -n "$out" ]; then printf '%s' "$reply" > "$out"; printf 201; else echo "$reply"; fi
 STUB
 printf '#!/bin/bash\necho "runner ran"\n' > "$t/runner/run.sh"
 chmod +x "$t/stub/gh" "$t/stub/curl" "$t/runner/run.sh"
