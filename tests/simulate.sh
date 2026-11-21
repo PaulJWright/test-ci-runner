@@ -184,7 +184,7 @@ cat > "$api/jobs-555" <<'JSON'
   {"id": 903, "status": "completed", "labels": ["test-ci-gh200-1gpu", "test-ci-run-555"]},
   {"id": 904, "status": "queued", "labels": ["ubuntu-latest"]}]}
 JSON
-echo '{"referenced_workflows": [{"path": "PaulJWright/test-ci/.github/workflows/gh200.yml@v0", "sha": "abc123", "ref": "refs/tags/v0"}]}' > "$api/run-555"
+echo '{"referenced_workflows": [{"path": "i-aye-eye/test-ci/.github/workflows/gh200.yml@v0", "sha": "abc123", "ref": "refs/tags/v0"}]}' > "$api/run-555"
 echo '{"jobs": [{"id": 911, "status": "queued", "labels": ["test-ci-gh200-1gpu", "test-ci-run-556"]}]}' > "$api/jobs-556"
 echo '{"referenced_workflows": []}' > "$api/run-556"
 echo '{"jobs": [{"id": 921, "status": "queued", "labels": ["test-ci-nope", "test-ci-run-557"]}]}' > "$api/jobs-557"
@@ -206,7 +206,7 @@ case $path in
   *generate-jitconfig) echo "CFG-$RANDOM"; exit 0 ;;
   repos/o/r/actions/runs/*/jobs*) f=jobs-$(sed 's#.*/runs/\([0-9]*\)/jobs.*#\1#' <<<"$path") ;;
   repos/o/r/actions/runs/*) f=run-${path##*/} ;;
-  repos/PaulJWright/test-ci/contents/request-runner/profiles.json\?ref=*) f=profiles
+  repos/i-aye-eye/test-ci/contents/request-runner/profiles.json\?ref=*) f=profiles
     echo "${path##*ref=}" >> "$FAKE_OUT/profile-refs" ;;
   *) echo "gh stand-in: no answer for $path" >&2; exit 1 ;;
 esac

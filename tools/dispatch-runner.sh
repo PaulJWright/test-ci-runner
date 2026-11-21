@@ -19,11 +19,11 @@
 #   --dir DIR     the test-ci-runner checkout on Isambard-AI, relative to home
 #                 (default test-ci-runner)
 #   --no-pull     don't git pull that checkout first
-#   --test-ci R   the repo holding gh200.yml and profiles.json (default PaulJWright/test-ci)
+#   --test-ci R   the repo holding gh200.yml and profiles.json (default i-aye-eye/test-ci)
 #   --interval N  seconds between checks with --watch (default 15)
 set -euo pipefail
 
-host=brics.aip2.isambard dir=test-ci-runner pull=1 watch=0 interval=15 test_ci=PaulJWright/test-ci
+host=brics.aip2.isambard dir=test-ci-runner pull=1 watch=0 interval=15 test_ci=i-aye-eye/test-ci
 while [ $# -gt 0 ]; do
   case $1 in
     --host) host=$2; shift 2 ;;

@@ -12,7 +12,7 @@ jobs:
       - name: Check out test-ci, for the contract check
         uses: actions/checkout@v5
         with:
-          repository: PaulJWright/test-ci
+          repository: i-aye-eye/test-ci
           path: test-ci
       - name: Install actionlint
         run: |

@@ -1,6 +1,6 @@
 # test-ci-runner
 
-This repo runs [test-ci](https://github.com/PaulJWright/test-ci)'s GitHub Actions jobs on Isambard-AI. 
+This repo runs [test-ci](https://github.com/i-aye-eye/test-ci)'s GitHub Actions jobs on Isambard-AI. 
 This includes the launcher inside each Slurm job, its pre-job hook, the custom shell for steps in a container image, and a dispatcher for starting runners by hand. A demo, not a BriCS product.
 
 Users never need to touch this repo. 
@@ -10,7 +10,7 @@ A user should call test-ci's reusable workflow.
 
 | Repo | Who uses it | What's in it |
 |---|---|---|
-| [test-ci](https://github.com/PaulJWright/test-ci) | Anyone whose repo runs jobs on Isambard-AI | The reusable workflow, the request job's action, examples |
+| [test-ci](https://github.com/i-aye-eye/test-ci) | Anyone whose repo runs jobs on Isambard-AI | The reusable workflow, the request job's action, examples |
 | test-ci-runner (this) | Whoever runs the service | Everything that starts and runs a runner |
 | ci-service | Phase A on: the job API, release page and submitter | Unchanged; its dev stack copies this repo into its Slurm container |
 
@@ -37,7 +37,7 @@ tools/dispatch-runner.sh    on your laptop: one runner per queued test-ci job (m
 tests/                      shellcheck, actionlint, the contract with test-ci, simulate.sh
 ```
 
-## The contract with `PaulJWright/test-ci`
+## The contract with `i-aye-eye/test-ci`
 
 The profiles live only in test-ci, in `request-runner/profiles.json`: each one's
 Slurm options and time limits. This repo keeps no copy. Its scripts take the
@@ -71,7 +71,7 @@ Set up once, on a UAN.
 The runner install sits beside this checkout, so the launcher finds `~/actions-runner/current` for `~/test-ci-runner`.
 
 ```bash
-git clone https://github.com/PaulJWright/test-ci-runner ~/test-ci-runner
+git clone https://github.com/i-aye-eye/test-ci-runner ~/test-ci-runner
 
 mkdir -p ~/actions-runner/2.338.2 && cd ~/actions-runner
 curl -fsSL https://github.com/actions/runner/releases/download/v2.338.2/actions-runner-linux-arm64-2.338.2.tar.gz \
@@ -100,7 +100,7 @@ ssh to `launcher/submit.sh` with the profile's settings. `submit.sh` keeps the
 config in a `0600` file and runs `sbatch`. It runs `git pull` in `~/test-ci-runner`
 first, so the cluster's launcher matches this repo. Options: `--host` (default
 `brics.aip2.isambard`), `--dir` (default `test-ci-runner`), `--test-ci` (default
-`PaulJWright/test-ci`), `--no-pull`, `--interval`.
+`i-aye-eye/test-ci`), `--no-pull`, `--interval`.
 
 Logs of each Slurm job are in `~/.test-ci/logs/` on Isambard-AI.
 
